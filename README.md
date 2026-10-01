@@ -19,10 +19,11 @@
 
 - ⚡ **Instant 1-Click Scan:** Analyze any active web page in seconds without leaving your tab.
 - 📊 **Security Health Score (0-100):** Visual gauge meter color-coded by risk severity (`CRITICAL`, `HIGH`, `MODERATE`, `EXCELLENT`).
+- 🛠️ **Technology Stack Detection:** Identifies web frameworks, JS libraries, CSS toolkits, CMS platforms, analytics tools, CDNs, and backend signatures (Next.js, React, Vue, Tailwind, WordPress, Cloudflare, etc.).
 - 🔍 **OWASP & DOM Vulnerability Scanner:** Deep client-side inspection for DOM XSS, exposed API keys, mixed content, insecure HTTP forms, and non-HttpOnly cookies.
 - 📑 **Exportable Vector PDF Reports:** Generate clean, multi-page vector PDF security reports (`.pdf`) offline using bundled `jsPDF`.
 - 🖥️ **Full-Page Printable Dashboard:** Open an executive HTML report tab with print-ready CSS (`window.print()`).
-- 🎯 **Severity Pill Filters:** Easily filter findings by severity level (`Critical`, `High`, `Medium`, `Low`, `Info`).
+- 🎯 **Severity & Tech Stack Filters:** Easily filter findings by severity level or toggle the Tech Stack view.
 - 🔒 **100% Privacy-First:** Performs all scanning client-side inside your browser. No external API calls, tracking, or remote data exfiltration.
 
 ---

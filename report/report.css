@@ -240,6 +240,79 @@ body {
 .sum-card.low .sum-count { color: var(--sev-low); }
 .sum-card.total .sum-count { color: var(--text-dark); }
 
+/* Tech Stack Grid */
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.report-tech-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.report-tech-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: #e0f2fe;
+  border: 1px solid #bae6fd;
+  color: #0284c7;
+  font-weight: 800;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.report-tech-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.report-tech-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.report-tech-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.report-tech-ver {
+  font-size: 10px;
+  font-weight: 700;
+  color: #059669;
+  background: #d1fae5;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.report-tech-cat {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #0284c7;
+}
+
+.report-tech-desc {
+  font-size: 11px;
+  color: #64748b;
+  line-height: 1.3;
+}
+
 /* Findings List */
 .findings-list {
   display: flex;

@@ -5,30 +5,32 @@ document.addEventListener('DOMContentLoaded', async () => {
   // DOM Elements
   const targetDomainEl = document.getElementById('targetDomain');
   const siteProtocolBadge = document.getElementById('siteProtocolBadge');
-  
+
   const initialState = document.getElementById('initialState');
   const scanningState = document.getElementById('scanningState');
   const resultsState = document.getElementById('resultsState');
-  
+
   const startScanBtn = document.getElementById('startScanBtn');
   const rescanBtn = document.getElementById('rescanBtn');
   const exportReportBtn = document.getElementById('exportReportBtn');
-  
+
   const scanningStepText = document.getElementById('scanningStepText');
   const scanProgressBar = document.getElementById('scanProgressBar');
-  
+
   const scoreValue = document.getElementById('scoreValue');
   const scoreGaugeArc = document.getElementById('scoreGaugeArc');
   const scoreRatingBadge = document.getElementById('scoreRatingBadge');
   const totalIssuesText = document.getElementById('totalIssuesText');
-  
+
   const cntCritical = document.getElementById('cntCritical');
   const cntHigh = document.getElementById('cntHigh');
   const cntMedium = document.getElementById('cntMedium');
   const cntLow = document.getElementById('cntLow');
   const cntInfo = document.getElementById('cntInfo');
-  
+  const cntTech = document.getElementById('cntTech');
+
   const vulnerabilitiesList = document.getElementById('vulnerabilitiesList');
+  const techStackSection = document.getElementById('techStackSection');
   const noIssuesState = document.getElementById('noIssuesState');
   const tabButtons = document.querySelectorAll('.tab-btn');
 
@@ -42,7 +44,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       activeTab = tabs[0];
       const url = new URL(activeTab.url || 'http://localhost');
       targetDomainEl.textContent = url.hostname || activeTab.url;
-      
+
       siteProtocolBadge.textContent = url.protocol.replace(':', '').toUpperCase();
       if (url.protocol === 'https:') {
         siteProtocolBadge.style.color = '#10B981';
@@ -111,9 +113,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     scanningState.classList.remove('hidden');
 
     const steps = [
-      { text: 'Connecting to tab DOM...', progress: 20 },
-      { text: 'Scanning inline scripts & secret leaks...', progress: 45 },
-      { text: 'Auditing security headers & forms...', progress: 70 },
+      { text: 'Connecting to tab DOM...', progress: 15 },
+      { text: 'Scanning inline scripts & secret leaks...', progress: 35 },
+      { text: 'Auditing security headers & forms...', progress: 55 },
+      { text: 'Detecting frameworks & tech stack...', progress: 75 },
       { text: 'Analyzing cookies & third-party CDNs...', progress: 90 },
       { text: 'Calculating security risk score...', progress: 100 }
     ];
@@ -121,7 +124,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     for (let i = 0; i < steps.length; i++) {
       scanningStepText.textContent = steps[i].text;
       scanProgressBar.style.width = `${steps[i].progress}%`;
-      await new Promise(r => setTimeout(r, 220));
+      await new Promise(r => setTimeout(r, 200));
     }
 
     try {
@@ -193,27 +196,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     scoreRatingBadge.className = `rating-badge ${ratingClass}`;
     scoreRatingBadge.textContent = scan.rating;
 
-    totalIssuesText.textContent = scan.totalIssues === 1 
-      ? '1 vulnerability detected' 
+    totalIssuesText.textContent = scan.totalIssues === 1
+      ? '1 vulnerability detected'
       : `${scan.totalIssues} vulnerabilities detected`;
 
-    // 2. Update Severity Counts
+    // 2. Update Severity & Tech Counts
     cntCritical.textContent = scan.counts.CRITICAL || 0;
     cntHigh.textContent = scan.counts.HIGH || 0;
     cntMedium.textContent = scan.counts.MEDIUM || 0;
     cntLow.textContent = scan.counts.LOW || 0;
     cntInfo.textContent = scan.counts.INFO || 0;
+    if (cntTech) cntTech.textContent = (scan.technologies || []).length;
 
     // 3. Render List
     renderVulnerabilitiesList('ALL');
   }
 
   /**
-   * Renders the list of vulnerabilities based on selected filter tab
+   * Renders the list of vulnerabilities or tech stack based on selected filter tab
    */
   function renderVulnerabilitiesList(filter = 'ALL') {
     if (!currentScanResult) return;
 
+    if (filter === 'TECH_STACK') {
+      vulnerabilitiesList.classList.add('hidden');
+      noIssuesState.classList.add('hidden');
+      techStackSection.classList.remove('hidden');
+      renderTechStack(currentScanResult.technologies || []);
+      return;
+    }
+
+    techStackSection.classList.add('hidden');
     vulnerabilitiesList.innerHTML = '';
     const items = currentScanResult.vulnerabilities || [];
 
@@ -330,6 +343,43 @@ document.addEventListener('DOMContentLoaded', async () => {
         Export Security Report
       `;
     }
+  }
+
+  /**
+   * Renders detected technology stack items
+   */
+  function renderTechStack(techs) {
+    techStackSection.innerHTML = '';
+    if (!techs || techs.length === 0) {
+      techStackSection.innerHTML = `
+        <div class="no-tech-state">
+          <div style="font-weight: 600; margin-bottom: 4px; color: var(--text-primary);">No Technology Signatures Detected</div>
+          <div>No standard web frameworks, libraries, or CMS signatures were identified on this page.</div>
+        </div>
+      `;
+      return;
+    }
+
+    techs.forEach(t => {
+      const card = document.createElement('div');
+      card.className = 'tech-card';
+
+      const iconLetter = (t.name || 'T').charAt(0).toUpperCase();
+
+      card.innerHTML = `
+        <div class="tech-icon-box">${iconLetter}</div>
+        <div class="tech-info">
+          <div class="tech-header-line">
+            <span class="tech-name">${escapeHtml(t.name)}</span>
+            ${t.version ? `<span class="tech-version-badge">v${escapeHtml(t.version)}</span>` : ''}
+          </div>
+          <span class="tech-category-pill">${escapeHtml(t.category)}</span>
+          ${t.description ? `<div class="tech-desc">${escapeHtml(t.description)}</div>` : ''}
+        </div>
+      `;
+
+      techStackSection.appendChild(card);
+    });
   }
 
   function escapeHtml(str) {

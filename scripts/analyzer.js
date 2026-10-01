@@ -464,6 +464,243 @@
   });
 
   // -------------------------------------------------------------
+  // 9. Technology Stack Detection Engine
+  // -------------------------------------------------------------
+  const detectedTechs = [];
+
+  function addTech(name, category, version = null, description = '') {
+    if (!detectedTechs.some(t => t.name === name)) {
+      detectedTechs.push({ name, category, version, description });
+    }
+  }
+
+  try {
+    // A. Web Frameworks & Libraries
+    if (window.__NEXT_DATA__ || document.getElementById('__NEXT_DATA__') || document.querySelector('script[src*="/_next/"]')) {
+      addTech('Next.js', 'Web Framework', window.__NEXT_DATA__?.buildId ? 'React SSR' : null, 'React Framework for Production');
+    }
+
+    if (window.React || window.__REACT_DEVTOOLS_GLOBAL_HOOK__ || document.querySelector('[data-reactroot], [data-reactid]') || Array.from(document.querySelectorAll('*')).some(el => Object.keys(el).some(k => k.startsWith('__reactFiber$') || k.startsWith('__reactProps$') || k.startsWith('_reactRootContainer')))) {
+      const ver = window.React?.version || null;
+      addTech('React', 'JavaScript Library', ver, 'UI Component Library by Meta');
+    }
+
+    if (window.__NUXT__ || document.getElementById('__NUXT__') || document.querySelector('script[src*="/_nuxt/"]')) {
+      addTech('Nuxt.js', 'Web Framework', null, 'Intuitive Vue Framework');
+    }
+
+    if (window.Vue || window.__VUE__ || document.querySelector('[data-v-]') || Array.from(document.querySelectorAll('*')).some(el => Object.keys(el).some(k => k.startsWith('__vue')))) {
+      const ver = window.Vue?.version || (window.__VUE__ ? 'v3' : null);
+      addTech('Vue.js', 'JavaScript Framework', ver, 'Progressive JavaScript Framework');
+    }
+
+    const ngEl = document.querySelector('[ng-version]');
+    if (window.ng || ngEl || document.querySelector('[ng-app], [ng-controller]')) {
+      const ver = ngEl?.getAttribute('ng-version') || null;
+      addTech('Angular', 'JavaScript Framework', ver, 'Web Application Platform by Google');
+    }
+
+    if (window.angular) {
+      const ver = window.angular?.version?.full || '1.x';
+      addTech('AngularJS', 'Legacy Framework', ver, 'Legacy JavaScript Framework');
+    }
+
+    if (window.__svelte || document.querySelector('style[id*="svelte"]') || document.querySelector('script[src*="_app/immutable"]') || Array.from(document.querySelectorAll('*')).some(el => Array.from(el.classList || []).some(c => c.startsWith('svelte-')))) {
+      addTech('Svelte', 'JavaScript Framework', null, 'Cybernetically enhanced web apps');
+    }
+
+    if (window.___gatsby || document.getElementById('___gatsby')) {
+      addTech('Gatsby', 'Static Site Generator', null, 'React-based static site generator');
+    }
+
+    if (window.jQuery || window.$?.fn?.jquery) {
+      const ver = window.jQuery?.fn?.jquery || window.$?.fn?.jquery || null;
+      addTech('jQuery', 'JavaScript Library', ver, 'DOM Manipulation Library');
+    }
+
+    if (window.Alpine || document.querySelector('[x-data], [x-init]')) {
+      const ver = window.Alpine?.version || null;
+      addTech('Alpine.js', 'JavaScript Framework', ver, 'Lightweight reactive framework');
+    }
+
+    if (window.htmx || document.querySelector('[hx-get], [hx-post], [hx-target], [hx-swap]')) {
+      const ver = window.htmx?.version || null;
+      addTech('HTMX', 'JavaScript Library', ver, 'AJAX & HTML extensions');
+    }
+
+    if (window.Ember || document.querySelector('.ember-view')) {
+      addTech('Ember.js', 'JavaScript Framework', window.Ember?.VERSION || null, 'Framework for ambitious web developers');
+    }
+
+    if (window.Backbone) {
+      addTech('Backbone.js', 'JavaScript Library', window.Backbone?.VERSION || null, 'RESTful JSON interface library');
+    }
+
+    // B. UI & CSS Frameworks
+    const hasTailwindClass = Array.from(document.querySelectorAll('*')).some(el => {
+      const cls = typeof el.className === 'string' ? el.className : '';
+      return /\b(flex|grid|hidden|bg-\w+-\d+|text-\w+-\d+|p[xy]?-\d+|m[xy]?-\d+|rounded-\w+|shadow-\w+)\b/.test(cls);
+    });
+    const hasTailwindLink = document.querySelector('link[href*="tailwind"], script[src*="tailwind"], style[id*="tailwind"]');
+    if (hasTailwindLink || hasTailwindClass) {
+      addTech('Tailwind CSS', 'CSS Framework', null, 'Utility-First CSS Framework');
+    }
+
+    const bsVer = window.bootstrap?.Tooltip?.VERSION || window.jQuery?.fn?.tooltip?.Constructor?.VERSION || null;
+    const hasBsLink = document.querySelector('link[href*="bootstrap"], script[src*="bootstrap"]');
+    const hasBsClass = document.querySelector('.container, .row, .col-md-6, .btn-primary, .modal-dialog');
+    if (window.bootstrap || hasBsLink || (hasBsClass && hasBsLink)) {
+      addTech('Bootstrap', 'CSS Framework', bsVer, 'Popular Responsive CSS Toolkit');
+    }
+
+    if (document.querySelector('link[href*="bulma"]') || (document.querySelector('.is-flex, .has-text-centered, .hero-body') && document.querySelector('link[href*="bulma"]'))) {
+      addTech('Bulma', 'CSS Framework', null, 'Modern CSS framework based on Flexbox');
+    }
+
+    if (window.Mui || document.querySelector('[class*="MuiBox-root"], [class*="MuiButton-root"], [class*="MuiTypography-root"]')) {
+      addTech('Material UI (MUI)', 'UI Component Library', null, 'React UI component library');
+    }
+
+    if (document.querySelector('[class*="chakra-"]')) {
+      addTech('Chakra UI', 'UI Component Library', null, 'Modular React component library');
+    }
+
+    if (document.querySelector('[class*="ant-btn"], [class*="ant-layout"], [class*="ant-menu"]')) {
+      addTech('Ant Design', 'UI Component Library', null, 'Enterprise-class UI design language');
+    }
+
+    if (document.querySelector('link[href*="font-awesome"], link[href*="fontawesome"], script[src*="fontawesome"]') || document.querySelector('i[class*="fa-"], i[class*="fas "], i[class*="fab "]')) {
+      addTech('Font Awesome', 'Icon Toolkit', null, 'Icon library and SVG toolkit');
+    }
+
+    // C. CMS & Site Builders
+    const wpMeta = document.querySelector('meta[name="generator"][content*="WordPress"]');
+    if (window.wp || wpMeta || document.querySelector('link[href*="wp-content"], script[src*="wp-includes"]')) {
+      const verMatch = wpMeta?.getAttribute('content')?.match(/WordPress\s+([\d.]+)/i);
+      addTech('WordPress', 'CMS', verMatch ? verMatch[1] : null, 'Popular Content Management System');
+    }
+
+    if (window.Shopify || document.querySelector('script[src*="cdn.shopify.com"]')) {
+      addTech('Shopify', 'E-commerce Platform', null, 'Global E-commerce Platform');
+    }
+
+    const wfMeta = document.querySelector('meta[content*="Webflow"]');
+    if (window.Webflow || wfMeta || document.querySelector('html[data-wf-page]')) {
+      addTech('Webflow', 'Website Builder', null, 'Visual web design & CMS platform');
+    }
+
+    const wixMeta = document.querySelector('meta[name="generator"][content*="Wix"]');
+    if (window.wixDeveloperAnalytics || wixMeta || document.querySelector('script[src*="wix.com"], link[href*="wixstatic.com"]')) {
+      addTech('Wix', 'Website Builder', null, 'Cloud-based web development platform');
+    }
+
+    const sqMeta = document.querySelector('meta[name="generator"][content*="Squarespace"]');
+    if (window.Static?.SQUARESPACE_CACHE_VERSION || sqMeta || document.querySelector('link[href*="squarespace.com"]')) {
+      addTech('Squarespace', 'Website Builder', null, 'Website builder and hosting platform');
+    }
+
+    const drupalMeta = document.querySelector('meta[name="generator"][content*="Drupal"]');
+    if (window.Drupal || drupalMeta || document.querySelector('script[src*="drupal.js"]')) {
+      const verMatch = drupalMeta?.getAttribute('content')?.match(/Drupal\s+([\d.]+)/i);
+      addTech('Drupal', 'CMS', verMatch ? verMatch[1] : null, 'Open-source content management software');
+    }
+
+    const joomlaMeta = document.querySelector('meta[name="generator"][content*="Joomla"]');
+    if (joomlaMeta || document.querySelector('script[src*="joomla"]')) {
+      addTech('Joomla', 'CMS', null, 'Flexible Content Management System');
+    }
+
+    const ghostMeta = document.querySelector('meta[name="generator"][content*="Ghost"]');
+    if (ghostMeta || document.querySelector('link[href*="ghost.css"]')) {
+      addTech('Ghost', 'Publishing Platform', null, 'Independent technology for modern publishing');
+    }
+
+    if (window.Mage || document.querySelector('script[src*="mage/"], link[href*="skin/frontend"]')) {
+      addTech('Magento', 'E-commerce Platform', null, 'Open source e-commerce platform');
+    }
+
+    // D. Analytics & Tracking
+    if (window.ga || window.gtag || window.dataLayer || document.querySelector('script[src*="google-analytics.com"], script[src*="googletagmanager.com/gtag/js"]')) {
+      addTech('Google Analytics', 'Analytics', null, 'Web analytics service by Google');
+    }
+
+    if (window.google_tag_manager || document.querySelector('script[src*="googletagmanager.com/gtm.js"]')) {
+      addTech('Google Tag Manager', 'Tag Management', null, 'Tag management system by Google');
+    }
+
+    if (window.fbq || document.querySelector('script[src*="connect.facebook.net"]')) {
+      addTech('Meta Pixel', 'Analytics & Ads', null, 'Conversion tracking for Facebook ads');
+    }
+
+    if (window.hj || document.querySelector('script[src*="static.hotjar.com"]')) {
+      addTech('Hotjar', 'Behavior Analytics', null, 'Heatmaps and behavior analytics');
+    }
+
+    if (window.clarity || document.querySelector('script[src*="clarity.ms"]')) {
+      addTech('Microsoft Clarity', 'Behavior Analytics', null, 'User behavior analytics tool');
+    }
+
+    if (window.mixpanel || document.querySelector('script[src*="mixpanel.com"]')) {
+      addTech('Mixpanel', 'Analytics', null, 'Product analytics software');
+    }
+
+    if (window.posthog || document.querySelector('script[src*="posthog"]')) {
+      addTech('PostHog', 'Product Analytics', null, 'Open source product analytics');
+    }
+
+    if (window.analytics?.track || document.querySelector('script[src*="cdn.segment.com"]')) {
+      addTech('Segment', 'Customer Data Platform', null, 'Customer data infrastructure platform');
+    }
+
+    // E. CDNs & Cloud Infrastructure
+    if (document.querySelector('script[src*="challenges.cloudflare.com"], script[src*="static.cloudflareinsights.com"]') || document.cookie.includes('__cf_bm') || document.cookie.includes('cf_clearance')) {
+      addTech('Cloudflare', 'CDN & Security', null, 'Content delivery network & security');
+    }
+
+    if (window.__VERCEL_ANALYTICS__ || document.querySelector('script[src*="_vercel"]')) {
+      addTech('Vercel', 'Hosting & Cloud', null, 'Cloud platform for web apps and functions');
+    }
+
+    if (document.querySelector('form[data-netlify]') || document.querySelector('script[src*="netlify"]')) {
+      addTech('Netlify', 'Hosting & Cloud', null, 'Web development and automation platform');
+    }
+
+    if (document.querySelector('script[src*="cloudfront.net"], link[href*="cloudfront.net"]')) {
+      addTech('Amazon CloudFront', 'CDN', null, 'Global content delivery network by AWS');
+    }
+
+    // F. Backend / Server Signatures
+    if (document.cookie.includes('PHPSESSID') || Array.from(document.querySelectorAll('a[href]')).some(a => (a.href || '').includes('.php'))) {
+      addTech('PHP', 'Backend Language', null, 'Server-side scripting language');
+    }
+
+    if (document.querySelector('input[name="__VIEWSTATE"]') || document.cookie.includes('ASP.NET_SessionId')) {
+      addTech('ASP.NET', 'Web Framework', null, 'Microsoft web framework');
+    }
+
+    if (document.cookie.includes('XSRF-TOKEN') && document.cookie.includes('laravel_session')) {
+      addTech('Laravel', 'Web Framework', null, 'PHP Web Framework');
+    }
+
+    if (document.cookie.includes('csrftoken') && document.cookie.includes('sessionid')) {
+      addTech('Django', 'Web Framework', null, 'Python Web Framework');
+    }
+
+    if (document.querySelector('meta[name="csrf-param"][content="authenticity_token"]') || document.cookie.includes('_session_id')) {
+      addTech('Ruby on Rails', 'Web Framework', null, 'Ruby Web Framework');
+    }
+
+    // Generic Generator Meta Tag Fallback
+    const genMeta = document.querySelector('meta[name="generator"]')?.getAttribute('content');
+    if (genMeta && !detectedTechs.some(t => genMeta.toLowerCase().includes(t.name.toLowerCase()))) {
+      addTech(genMeta.trim(), 'CMS / Generator', null, 'Detected from HTML generator meta tag');
+    }
+
+  } catch (e) {
+    // Ignore tech detection errors gracefully
+  }
+
+  // -------------------------------------------------------------
   // Score Calculation & Final Synthesis
   // -------------------------------------------------------------
   let score = 100;
@@ -504,6 +741,7 @@
     badgeColor,
     counts,
     totalIssues: vulnerabilities.length,
-    vulnerabilities
+    vulnerabilities,
+    technologies: detectedTechs
   };
 })();

@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const sumMedium = document.getElementById('sumMedium');
   const sumLow = document.getElementById('sumLow');
 
+  const techContainer = document.getElementById('techContainer');
   const findingsContainer = document.getElementById('findingsContainer');
 
   let currentScan = null;
@@ -78,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     scoreNum.textContent = scan.score;
 
     reportRating.textContent = scan.rating;
-    
+
     // Rating colors
     let ratingBg = '#10B981';
     if (scan.score < 50 || scan.counts.CRITICAL > 0) ratingBg = '#EF4444';
@@ -95,6 +96,37 @@ document.addEventListener('DOMContentLoaded', async () => {
     sumHigh.textContent = scan.counts.HIGH || 0;
     sumMedium.textContent = scan.counts.MEDIUM || 0;
     sumLow.textContent = (scan.counts.LOW || 0) + (scan.counts.INFO || 0);
+
+    // Render Tech Stack
+    techContainer.innerHTML = '';
+    const techs = scan.technologies || [];
+
+    if (techs.length === 0) {
+      techContainer.innerHTML = `
+        <div style="grid-column: 1 / -1; padding: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; color: #64748b; font-size: 12px; text-align: center;">
+          No standard technology or framework signatures detected on this target page.
+        </div>
+      `;
+    } else {
+      techs.forEach(t => {
+        const card = document.createElement('div');
+        card.className = 'report-tech-card';
+        const iconLetter = (t.name || 'T').charAt(0).toUpperCase();
+
+        card.innerHTML = `
+          <div class="report-tech-icon">${iconLetter}</div>
+          <div class="report-tech-info">
+            <div class="report-tech-title">
+              <span class="report-tech-name">${escapeHtml(t.name)}</span>
+              ${t.version ? `<span class="report-tech-ver">v${escapeHtml(t.version)}</span>` : ''}
+            </div>
+            <span class="report-tech-cat">${escapeHtml(t.category)}</span>
+            ${t.description ? `<div class="report-tech-desc">${escapeHtml(t.description)}</div>` : ''}
+          </div>
+        `;
+        techContainer.appendChild(card);
+      });
+    }
 
     // Render Detailed Findings
     findingsContainer.innerHTML = '';

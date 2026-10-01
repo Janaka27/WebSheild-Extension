@@ -16,13 +16,14 @@ With a single click, WebShield scans the active web page and delivers a comprehe
 ### Key Features:
 - **Instant Security Auditing:** Scan any web page with a single click of the extension popup button.
 - **Security Score Gauge:** Get an overall 0-100 security rating based on real-time findings.
+- **Technology Stack Detection:** Instantly identify frameworks, JS libraries, CSS toolkits, CMS engines, analytics trackers, and server signatures.
 - **Cross-Site Scripting (XSS) & DOM Analysis:** Detect dangerous inline script executions, eval() usage, and unsanitized innerHTML DOM manipulations.
 - **Secret & Credential Leak Detection:** Scan inline scripts and page source for hardcoded API keys (AWS, Stripe, OpenAI), JWT tokens, and private keys.
 - **Connection & Protocol Health:** Identify unencrypted HTTP connections, active mixed content, and insecure resource loading.
 - **Header & Meta Security Checks:** Audit Content Security Policy (CSP), anti-clickjacking frame options, and referrer leak policies.
 - **Form & Input Inspection:** Flag cleartext password submissions, missing anti-CSRF tokens, and insecure HTTP form targets.
 - **Resource Integrity & Link Safety:** Detect third-party CDN scripts missing Subresource Integrity (SRI) hashes and reverse tabnabbing links.
-- **Exportable Reports:** Easily copy formatted Markdown vulnerability reports to your clipboard.
+- **Exportable PDF & HTML Reports:** Generate vector PDF reports and printable executive security dashboards.
 
 ---
 

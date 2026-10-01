@@ -153,6 +153,51 @@
     yPos += 34;
 
     // -------------------------------------------------------------
+    // DETECTED TECHNOLOGY STACK
+    // -------------------------------------------------------------
+    const techs = scanResult.technologies || [];
+    if (techs.length > 0) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.setTextColor(15, 23, 42);
+      doc.text(`Detected Technology Stack (${techs.length} Identified)`, margin, yPos);
+      yPos += 6;
+
+      const techBoxHeight = Math.ceil(techs.length / 2) * 10 + 6;
+      checkPageOverflow(techBoxHeight);
+
+      doc.setFillColor(248, 250, 252);
+      doc.setDrawColor(226, 232, 240);
+      doc.roundedRect(margin, yPos, contentWidth, techBoxHeight, 2, 2, 'FD');
+
+      let col = 0;
+      let rowY = yPos + 6;
+      techs.forEach((t, i) => {
+        const itemX = col === 0 ? margin + 6 : margin + (contentWidth / 2) + 2;
+        
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.setTextColor(15, 23, 42);
+        const nameVer = t.version ? `${t.name} (v${t.version})` : t.name;
+        doc.text(nameVer, itemX, rowY);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7.5);
+        doc.setTextColor(2, 132, 199);
+        doc.text(` [${t.category}]`, itemX + doc.getTextWidth(nameVer) + 1, rowY);
+
+        if (col === 1 || i === techs.length - 1) {
+          col = 0;
+          rowY += 9;
+        } else {
+          col = 1;
+        }
+      });
+
+      yPos += techBoxHeight + 8;
+    }
+
+    // -------------------------------------------------------------
     // DETAILED VULNERABILITIES LISTING
     // -------------------------------------------------------------
     doc.setFont('helvetica', 'bold');
