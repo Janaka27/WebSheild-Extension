@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebShield Security Scanner</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Extension Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="logo-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>WebShield</h1>
+          <span class="sub-title">Vulnerability Scanner Pro</span>
+        </div>
+      </div>
+      <div class="header-status">
+        <span id="siteProtocolBadge" class="protocol-badge">HTTP/S</span>
+      </div>
+    </header>
+
+    <!-- Target Site Info Banner -->
+    <section class="target-site-card">
+      <div class="site-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+      </div>
+      <div class="site-details">
+        <span class="site-label">Target Website</span>
+        <div id="targetDomain" class="site-domain">Detecting tab...</div>
+      </div>
+    </section>
+
+    <!-- Initial State / Scan CTA -->
+    <div id="initialState" class="state-container">
+      <div class="hero-graphic">
+        <div class="pulse-ring"></div>
+        <div class="shield-hero">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <circle cx="12" cy="11" r="3"/>
+            <path d="M12 14v3"/>
+          </svg>
+        </div>
+      </div>
+      <h2 class="hero-title">Scan Page Security</h2>
+      <p class="hero-desc">Audits DOM flaws, XSS risks, secret leaks, missing headers, insecure forms, and unsafe cookies.</p>
+      <button id="startScanBtn" class="btn-primary">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <span>Analyze Website Now</span>
+      </button>
+    </div>
+
+    <!-- Scanning Progress State -->
+    <div id="scanningState" class="state-container hidden">
+      <div class="radar-scanner">
+        <div class="radar-line"></div>
+        <div class="radar-center"></div>
+      </div>
+      <h3 class="scanning-title">Analyzing Page Security</h3>
+      <div id="scanningStepText" class="scanning-step">Inspect DOM elements...</div>
+      <div class="progress-bar-container">
+        <div id="scanProgressBar" class="progress-bar-fill"></div>
+      </div>
+    </div>
+
+    <!-- Results Dashboard State -->
+    <div id="resultsState" class="state-container hidden">
+      <!-- Security Score Meter Card -->
+      <div class="score-card">
+        <div class="score-gauge-container">
+          <svg class="gauge-svg" viewBox="0 0 100 100">
+            <circle class="gauge-bg" cx="50" cy="50" r="42"/>
+            <circle id="scoreGaugeArc" class="gauge-arc" cx="50" cy="50" r="42" stroke-dasharray="263.89" stroke-dashoffset="263.89"/>
+          </svg>
+          <div class="score-display">
+            <span id="scoreValue" class="score-number">--</span>
+            <span class="score-max">/100</span>
+          </div>
+        </div>
+        <div class="score-info">
+          <div id="scoreRatingBadge" class="rating-badge rating-good">EXCELLENT</div>
+          <div id="totalIssuesText" class="score-subtext">0 vulnerabilities found</div>
+          <button id="rescanBtn" class="btn-secondary-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21.5 2v6h-6M2.5 22v-6h6"/>
+              <path d="M2 11.5a10 10 0 0 1 18.8-4.3L21.5 8M22 12.5a10 10 0 0 1-18.8 4.2L2.5 16"/>
+            </svg>
+            Re-scan
+          </button>
+        </div>
+      </div>
+
+      <!-- Severity Summary Breakdown Pills -->
+      <div class="severity-summary">
+        <div class="sev-pill critical" data-sev="CRITICAL">
+          <span class="pill-dot"></span>
+          <span class="pill-label">Critical</span>
+          <span id="cntCritical" class="pill-count">0</span>
+        </div>
+        <div class="sev-pill high" data-sev="HIGH">
+          <span class="pill-dot"></span>
+          <span class="pill-label">High</span>
+          <span id="cntHigh" class="pill-count">0</span>
+        </div>
+        <div class="sev-pill medium" data-sev="MEDIUM">
+          <span class="pill-dot"></span>
+          <span class="pill-label">Med</span>
+          <span id="cntMedium" class="pill-count">0</span>
+        </div>
+        <div class="sev-pill low" data-sev="LOW">
+          <span class="pill-dot"></span>
+          <span class="pill-label">Low</span>
+          <span id="cntLow" class="pill-count">0</span>
+        </div>
+        <div class="sev-pill info" data-sev="INFO">
+          <span class="pill-dot"></span>
+          <span class="pill-label">Info</span>
+          <span id="cntInfo" class="pill-count">0</span>
+        </div>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="filter-tabs">
+        <button class="tab-btn active" data-tab="ALL">All Issues</button>
+        <button class="tab-btn" data-tab="HIGH_RISK">High & Critical</button>
+        <button class="tab-btn" data-tab="MEDIUM">Medium</button>
+        <button class="tab-btn" data-tab="LOW">Low & Info</button>
+      </div>
+
+      <!-- Vulnerabilities List Scroll View -->
+      <div id="vulnerabilitiesList" class="vulnerability-list">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <!-- Empty / Secure State -->
+      <div id="noIssuesState" class="empty-state hidden">
+        <div class="empty-icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+        </div>
+        <h4>No Client Vulnerabilities Found!</h4>
+        <p>The analyzer detected no standard DOM flaws, secret leaks, or insecure form patterns on this page.</p>
+      </div>
+
+      <!-- Action Footer -->
+      <footer class="app-footer">
+        <button id="exportReportBtn" class="btn-footer">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Export Security Report
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../lib/jspdf.umd.min.js"></script>
+  <script src="../scripts/pdf-exporter.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
