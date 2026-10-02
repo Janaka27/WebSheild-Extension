@@ -388,6 +388,48 @@ body {
   color: #334155;
 }
 
+.field-text.location {
+  color: #0284c7;
+  font-weight: 600;
+  font-family: monospace;
+  font-size: 12px;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  padding: 4px 10px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  word-break: break-all;
+  width: fit-content;
+  transition: all 0.2s ease;
+}
+
+.field-text.location.action-btn {
+  cursor: pointer;
+}
+
+.field-text.location.action-btn:hover {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #0369a1;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+}
+
+.report-jump-tag {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: rgba(2, 132, 199, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.field-text.location.action-btn:hover .report-jump-tag {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
 .field-text.impact { color: #b91c1c; }
 .field-text.recommendation { color: #047857; font-weight: 500; }
 

@@ -734,6 +734,49 @@ body {
   line-height: 1.4;
 }
 
+.vuln-location-badge {
+  font-size: 11px;
+  font-family: monospace;
+  font-weight: 600;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 4px 10px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  word-break: break-all;
+  margin-top: 4px;
+  width: 100%;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.vuln-location-badge.action-btn {
+  cursor: pointer;
+}
+
+.vuln-location-badge.action-btn:hover {
+  background: rgba(0, 242, 254, 0.2);
+  border-color: #00f2fe;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 242, 254, 0.25);
+}
+
+.jump-hint {
+  font-size: 9px;
+  font-weight: 700;
+  color: #00f2fe;
+  text-transform: uppercase;
+  background: rgba(0, 242, 254, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
 .vuln-rec {
   color: #a7f3d0;
 }

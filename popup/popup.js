@@ -272,6 +272,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             <span class="category-badge">${escapeHtml(item.category)}</span>
           </div>
           <div class="vuln-section">
+            <div class="vuln-section-title">Exact Location / Path</div>
+            <button class="vuln-location-badge action-btn" title="Click to jump & highlight location on target page">
+              📍 ${escapeHtml(item.location || 'Page Source / Global Context')}
+              <span class="jump-hint">Jump to Place &rarr;</span>
+            </button>
+          </div>
+          <div class="vuln-section">
             <div class="vuln-section-title">Description</div>
             <div class="vuln-desc">${escapeHtml(item.description)}</div>
           </div>
@@ -298,8 +305,135 @@ document.addEventListener('DOMContentLoaded', async () => {
         card.classList.toggle('open');
       });
 
+      // Jump to Location click handler
+      const locBtn = card.querySelector('.vuln-location-badge.action-btn');
+      if (locBtn) {
+        locBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          highlightVulnerabilityTarget(item);
+        });
+      }
+
       vulnerabilitiesList.appendChild(card);
     });
+  }
+
+  /**
+   * Highlights & jumps to target vulnerability location on active browser tab
+   */
+  async function highlightVulnerabilityTarget(item) {
+    if (!activeTab || !activeTab.id) return;
+    try {
+      await chrome.tabs.update(activeTab.id, { active: true });
+      await chrome.scripting.executeScript({
+        target: { tabId: activeTab.id },
+        func: (vulnItem) => {
+          document.querySelectorAll('.webshield-target-overlay, .webshield-target-banner').forEach(el => el.remove());
+
+          let targetEl = null;
+
+          if (vulnItem.targetType === 'SCRIPT' && vulnItem.targetSelector !== null) {
+            const scripts = Array.from(document.querySelectorAll('script'));
+            const idx = parseInt(vulnItem.targetSelector, 10);
+            if (!isNaN(idx) && scripts[idx]) {
+              targetEl = scripts[idx];
+            }
+          } else if (vulnItem.targetType === 'DOM_ELEMENT' && vulnItem.targetSelector) {
+            try {
+              targetEl = document.querySelector(vulnItem.targetSelector);
+            } catch (e) {}
+          } else if (vulnItem.targetType === 'FORM') {
+            targetEl = document.querySelector('form');
+          }
+
+          if (!targetEl && vulnItem.elementSnippet) {
+            const cleanSnippet = vulnItem.elementSnippet.replace(/^Match:\s*/, '').trim();
+            const allElements = Array.from(document.querySelectorAll('*'));
+            targetEl = allElements.find(el => el.outerHTML && el.outerHTML.includes(cleanSnippet.substring(0, 30)));
+          }
+
+          if (targetEl && targetEl.tagName && !['head', 'script', 'meta'].includes(targetEl.tagName.toLowerCase())) {
+            targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            const origOutline = targetEl.style.outline;
+            const origBoxShadow = targetEl.style.boxShadow;
+            const origTransition = targetEl.style.transition;
+
+            targetEl.style.transition = 'all 0.3s ease';
+            targetEl.style.outline = '4px solid #EF4444';
+            targetEl.style.boxShadow = '0 0 24px rgba(239, 68, 68, 0.9)';
+
+            setTimeout(() => {
+              targetEl.style.outline = origOutline;
+              targetEl.style.boxShadow = origBoxShadow;
+              targetEl.style.transition = origTransition;
+            }, 6000);
+          }
+
+          const banner = document.createElement('div');
+          banner.className = 'webshield-target-banner';
+          banner.style.cssText = `
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 2147483647;
+            background: #0F172A;
+            color: #F8FAFC;
+            border: 2px solid #00F2FE;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 242, 254, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            max-width: 440px;
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 13px;
+            line-height: 1.4;
+            animation: webShieldSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          `;
+
+          banner.innerHTML = `
+            <style>
+              @keyframes webShieldSlideIn {
+                from { transform: translateY(30px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+              }
+            </style>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #00F2FE;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                WebShield Target Inspector
+              </div>
+              <button id="webshieldCloseBannerBtn" style="background: none; border: none; color: #94A3B8; cursor: pointer; font-size: 18px; font-weight: 700; padding: 0 4px;">&times;</button>
+            </div>
+            <div style="font-weight: 700; font-size: 14px; margin-bottom: 4px; color: #FFFFFF;">${vulnItem.title}</div>
+            <div style="font-size: 11px; color: #38BDF8; font-family: monospace; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); padding: 4px 8px; border-radius: 4px; margin-bottom: 8px; word-break: break-all;">
+              📍 Location: ${vulnItem.location}
+            </div>
+            ${vulnItem.elementSnippet ? `
+              <div style="font-size: 11px; color: #94A3B8; margin-bottom: 2px;">Evidence Snippet:</div>
+              <div style="font-family: monospace; font-size: 11px; background: #070A12; color: #F59E0B; padding: 6px; border-radius: 4px; overflow-x: auto; max-height: 80px; margin-bottom: 8px; border: 1px solid #1E293B;">
+                ${vulnItem.elementSnippet}
+              </div>
+            ` : ''}
+            <div style="font-size: 11px; color: #A7F3D0;">💡 Recommendation: ${vulnItem.recommendation}</div>
+          `;
+
+          document.body.appendChild(banner);
+
+          document.getElementById('webshieldCloseBannerBtn')?.addEventListener('click', () => {
+            banner.remove();
+          });
+
+          setTimeout(() => {
+            if (document.body.contains(banner)) banner.remove();
+          }, 8000);
+        },
+        args: [item]
+      });
+    } catch (err) {
+      console.error('Error navigating to location:', err);
+    }
   }
 
   /**

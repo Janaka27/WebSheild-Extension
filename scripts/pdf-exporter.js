@@ -210,12 +210,13 @@
       const c = colorMap[item.severity] || colorMap.INFO;
 
       // Estimate height needed for this card
+      const locLines = doc.splitTextToSize(`Location / Path: ${item.location || 'Page Source / Global Context'}`, contentWidth - 16);
       const descLines = doc.splitTextToSize(`Description: ${item.description}`, contentWidth - 16);
       const impactLines = doc.splitTextToSize(`Security Impact: ${item.impact}`, contentWidth - 16);
       const recLines = doc.splitTextToSize(`Remediation: ${item.recommendation}`, contentWidth - 16);
       const snippetLines = item.elementSnippet ? doc.splitTextToSize(`Evidence: ${item.elementSnippet.replace(/\n/g, ' ')}`, contentWidth - 20) : [];
 
-      const cardHeight = 22 + (descLines.length * 4) + (impactLines.length * 4) + (recLines.length * 4) + (snippetLines.length > 0 ? (snippetLines.length * 3.5 + 8) : 4);
+      const cardHeight = 22 + (locLines.length * 4) + (descLines.length * 4) + (impactLines.length * 4) + (recLines.length * 4) + (snippetLines.length > 0 ? (snippetLines.length * 3.5 + 8) : 4);
 
       checkPageOverflow(cardHeight);
 
@@ -251,6 +252,15 @@
       doc.text(`ID: ${item.id}  |  Category: ${item.category}`, margin + 8, yPos + 12);
 
       let innerY = yPos + 18;
+
+      // Location / Path
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8.5);
+      doc.setTextColor(2, 132, 199); // Blue #0284c7
+      locLines.forEach(line => {
+        doc.text(line, margin + 8, innerY);
+        innerY += 4;
+      });
 
       // Description
       doc.setFont('helvetica', 'normal');
